@@ -1,1 +1,66 @@
-chrome.runtime.onInstalled.addListener(()=>{const menu=[['smartSave','Smart Save (fallback)','image']];for(const [id,title,ctx] of menu){try{chrome.contextMenus.create({id,title,contexts:[ctx]});}catch(e){}}});chrome.contextMenus.onClicked.addListener((info,tab)=>{if(info.menuItemId==='smartSave'){chrome.scripting.executeScript({target:{tabId:tab.id},func:(i)=>{ /* injected code */(async()=>{const src=i.srcUrl;const fname=prompt('Filename','image.png'); if(!fname)return;try{const h=await fetch(src,{method:'HEAD',mode:'no-cors'});if(h.ok){chrome.runtime.sendMessage({action:'directDownload',url:src,filename:fname});return;}}catch{}chrome.runtime.sendMessage({action:'screenshotVisible',filename:fname});})();},args:[info]});}});chrome.runtime.onMessage.addListener((msg,sender)=>{if(msg.action==='directDownload'){chrome.downloads.download({url:msg.url,filename:msg.filename});}if(msg.action==='screenshotVisible'){chrome.tabs.captureVisibleTab(sender.tab.windowId,{format:'png'},url=>{chrome.downloads.download({url,filename:msg.filename});});}});
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "saveImage",
+    title: "📥 Enregistrer cette image (Smart Saver)",
+    contexts: ["image"]
+  });
+
+  chrome.contextMenus.create({
+    id: "saveAllImages",
+    title: "📦 Enregistrer toutes les images",
+    contexts: ["all"]
+  });
+
+  chrome.contextMenus.create({
+    id: "screenshotPage",
+    title: "📸 Capturer la page",
+    contexts: ["all"]
+  });
+
+  chrome.contextMenus.create({
+    id: "cleanOverlays",
+    title: "🧹 Supprimer les protections visuelles",
+    contexts: ["all"]
+  });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "saveImage" && info.srcUrl) {
+    chrome.downloads.download({
+      url: info.srcUrl,
+      filename: "image_smart.png"
+    }, () => {
+      chrome.notifications.create({
+        type: "basic",
+        iconUrl: "icon.png",
+        title: "Téléchargement terminé",
+        message: "L’image a été enregistrée avec succès !"
+      });
+    });
+  }
+  else if (info.menuItemId === "saveAllImages") {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ["content.js"]
+    });
+  }
+  else if (info.menuItemId === "screenshotPage") {
+    chrome.tabs.captureVisibleTab(null, { format: "png" }, dataUrl => {
+      chrome.downloads.download({ url: dataUrl, filename: "screenshot.png" }, () => {
+        chrome.notifications.create({
+          type: "basic",
+          iconUrl: "icon.png",
+          title: "Capture enregistrée",
+          message: "La capture d’écran a été enregistrée !"
+        });
+      });
+    });
+  }
+  else if (info.menuItemId === "cleanOverlays") {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ["remove_overlays.js"]
+    });
+  }
+});

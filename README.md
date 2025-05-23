@@ -37,16 +37,6 @@ To try it:
 
 Once loaded, click on the extension icon or use the right-click context menu to test image extraction.
 
-## 🔐 Pro Version (Full Access)
-
-The Pro version allows you to:
-- Save any image, even those rendered via JavaScript or canvas
-- Automatically trigger fallback capture when download is blocked
-- Remove overlays and visual traps with one click
-
-🎫 [Buy a license](https://yourdomain.com)  
-📩 Need help? Contact: [you@example.com](mailto:you@example.com)
-
 ## ⚠️ License
 
 This code is distributed for demonstration purposes only.  

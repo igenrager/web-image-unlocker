@@ -4,7 +4,14 @@
   "name": "Smart Image Saver",
   "version": "1.1",
   "description": "Save protected images from HTML, CSS, Canvas, and more.",
-  "permissions": ["scripting", "activeTab", "downloads", "tabs", "notifications"],
+  "permissions": [
+    "scripting",
+    "activeTab",
+    "downloads",
+    "tabs",
+    "notifications",
+    "contextMenus"
+  ],
   "background": {
     "service_worker": "background.js"
   },
